@@ -4,11 +4,12 @@
 //todo: make the waiting room function
 //todo: make it fit in one screen
 
-import React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { React, useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import './App.css';
 import PlayerPanel from './components/PlayerPanel'
+import GameOverModal from './components/GameOverModal';
+import MidTurnModal from './components/MidTurnModal';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'
 const socket = io(API_URL)
@@ -34,6 +35,28 @@ function App() {
   const [selectionType, setSelectionType] = useState(null)
   const [gameOverModal, setGameOverModal] = useState(false)
   const [midTurnModal, setMidTurnModal] = useState(false)
+  const [winner, setWinner] = useState('Player 1')
+  const [isGameOver, setIsGameOver] = useState(false)
+
+
+
+  // modals oh no
+
+  const closeGameOverModal = () =>{
+    setGameOverModal(false)
+  }
+
+  const openMidTurnModal = () => {
+    setGameOverModal(false)
+    setMidTurnModal(true)
+  }
+
+  const closeMidTurnModal = () => {
+    setMidTurnModal(false)
+  }
+
+
+
 
   useEffect(() => {
     msgList.current?.scrollIntoView({ behavior: 'smooth' })
@@ -67,7 +90,7 @@ function App() {
       setSelectedDefenseRolls([])
       setWaitingForSelection(false)
       setSelectionType(null)
-      setMidTurnModal(true)
+      openMidTurnModal()
       setMsg((prevMsg) => [...prevMsg, data.message])
     })
 
@@ -110,6 +133,8 @@ function App() {
 
     socket.on('game_over', (data) => {
       setGameOverModal(true)
+      setIsGameOver(true)
+      setWinner(data.winner || currentPlayer)
       setMsg((prevMsg) => [...prevMsg, data.message])
     })
 
@@ -217,9 +242,47 @@ function App() {
     addMessage('Defense confirmed: ' + selectedDefenseRolls.map(i => defenseRolls[i]).join(', ') + ' = ' + selectedDefenseRolls.reduce((sum, i) => sum + defenseRolls[i], 0))
   }
 
+  const newGame = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (!response.ok) {
+        throw new Error('Unable to reset the game.')
+      }
+      const data = await response.json()
+      setGameOverModal(false)
+      setIsGameOver(false)
+      setWinner('')
+      setAttackConfirmedTurn(false)
+      setDefenseConfirmedTurn(false)
+      setWaitingForSelection(false)
+      setSelectionType(null)
+      setAttackRolls([])
+      setSelectedAttackRolls([])
+      setDefenseRolls([])
+      setSelectedDefenseRolls([])
+      setTurn(1)
+      setMsg((prevMsg) => [...prevMsg, data.message || 'Game reset.'])
+      socket.emit('request_game_state')
+    } catch (error) {
+      addMessage(error.message)
+    }
+  }
+
   return (
     <div className="App" style={{ padding: '10%' }}>
       <header className="App-header">
+        {gameOverModal && isGameOver && (
+          <GameOverModal winner={winner} hp1={hp1} hp2={hp2} closeModal={closeGameOverModal} newGame={newGame} />
+        )}
+        <h1>TURN {turn}</h1>
+        {midTurnModal && !gameOverModal && (
+          <MidTurnModal currentPlayer={currentPlayer} closeModal={closeMidTurnModal} turn={turn}/>
+        )}
         <PlayerPanel
           title="Opponent"
           role={playerRole === 'Player 1' ? 'Player 2' : 'Player 1'}

@@ -4,27 +4,28 @@ import "./Modal.css"
 
 
 //i hate this as much as you do but god i do not know if this works
-function Modal({ winner, hp1, hp2 }) {
+//the new game button should refresh the redis store. but the fact that this is working at all is good
+function GameOverModal({ winner, hp1, hp2, closeModal, newGame }) {
   return (
-    <div className='modalBackground'>
+    <div className='modalBackground' onClick={closeModal}>
       <div className='modalContainer'>
         <div className='titleCloseBtn'>
           <button onClick={closeModal}>X</button>
         </div>
         <div className='title'>
+          <h1>Game Over!</h1>
           <h1>The winner is {winner}!</h1>
         </div>
         <div className='body'>
-          <p>Player 1 HP: {hp1}</p>
-          <p>Player 2 HP:</p>
+          <h6>Player 1 HP: {hp1}</h6>
+          <h6>Player 2 HP: {hp2}</h6>
         </div>
         <div className='footer'>
-          <button onClick={() => openEditModal(item)}>Edit</button>
-          <button onClick={() => openDeleteModal(item)}>Delete</button>
+          <button onClick={(event) => { event.stopPropagation(); newGame(); }}>New Game</button>
         </div>
       </div>
     </div>
   );
 }
 
-export default Modal;
+export default GameOverModal;

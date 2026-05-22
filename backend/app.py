@@ -7,11 +7,7 @@ from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-try:
-    import pika
-except ModuleNotFoundError:
-    pika = None
-    print('ERROR: pika is not installed in this Python environment. Install it with .venv/bin/python3 -m pip install pika.')
+import pika
 from redis_store import CosmiconStore
 from game_logic import GameLogic
 
@@ -232,6 +228,15 @@ def api():
 def api_state():
     ensure_game_initialized()
     return jsonify(store.get_game_state())
+
+@app.route('/api/reset', methods=['POST'])
+def api_reset():
+    ensure_game_initialized()
+    temporary_rolls.clear()
+    store.initialize_game()
+    publish_game_event('game_state', store.get_game_state())
+    publish_game_event('reset', {'message': 'Game reset. New round started.'})
+    return jsonify({'message': 'Game reset successfully.'})
 
 @socketio.on('connect')
 def handle_connect():

@@ -7,7 +7,7 @@ class CosmiconStore:
     def __init__(self, host="localhost", port=6379, db=0):
         self.client = redis.Redis(host=host, port=port, db=db, decode_responses=True)
 
-    def initialize_game(self, starting_hp=30):
+    def initialize_game(self, starting_hp=5):
         self.client.hset(self.KEY_STATE, mapping={
             "current_turn": 1,
             "current_attacker": "Player 1",

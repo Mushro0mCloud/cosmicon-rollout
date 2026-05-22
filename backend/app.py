@@ -3,11 +3,11 @@ import random
 import threading
 import json
 from datetime import datetime
+import pika
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-import pika
 from redis_store import CosmiconStore
 from game_logic import GameLogic
 
@@ -214,7 +214,9 @@ def emit_game_log(message, room=None):
 
 
 
-
+@app.route('/time')
+def get_current_time():
+    return jsonify({'time': time.time()})
 
 @app.route('/')
 def index():
@@ -302,4 +304,4 @@ def confirm_defense_selection(data):
 
 if __name__ == '__main__':
     start_rabbitmq_consumers()
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=False, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

@@ -12,7 +12,18 @@ import GameOverModal from './components/GameOverModal';
 import MidTurnModal from './components/MidTurnModal';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'
-const socket = io(API_URL)
+let socket = null;
+
+const getSocket = () => {
+  if (!socket) {
+    console.log('Initializing socket.io connection to:', API_URL);
+    socket = io(API_URL);
+    socket.on('connect', () => console.log('Socket connected'));
+    socket.on('disconnect', () => console.log('Socket disconnected'));
+    socket.on('error', (error) => console.log('Socket error:', error));
+  }
+  return socket;
+}
 
 function App() {
   const [playerRole, setPlayerRole] = useState('Initializing roles...')
@@ -37,6 +48,15 @@ function App() {
   const [midTurnModal, setMidTurnModal] = useState(false)
   const [winner, setWinner] = useState('Player 1')
   const [isGameOver, setIsGameOver] = useState(false)
+  const [currentTime, setCurrentTime] = useState(null)
+
+  const socket = getSocket();
+
+  useEffect(() => {
+    fetch(`${API_URL}/time`).then(res => res.json()).then(data => {
+      setCurrentTime(data.time);
+    });
+  }, []);
 
 
 
@@ -153,19 +173,11 @@ function App() {
     socket.emit('request_game_state')
 
     return () => {
-      socket.off('player_assigned')
-      socket.off('game_state')
-      socket.off('turn_changed')
-      socket.off('attack_rolled')
-      socket.off('defense_rolled')
-      socket.off('attack_selection_confirmed')
-      socket.off('defense_selection_confirmed')
-      socket.off('action_confirmed')
-      socket.off('game_over')
-      socket.off('rabbit_message')
-      socket.off('error')
+      // Note: not removing listeners to preserve bidirectional connection
+      // socket.off('player_assigned')
+      // socket.off('game_state')
     }
-  }, [])
+  }, [socket]);
 
   const addMessage = (text) => {
     setMsg((prevMsg) => [...prevMsg, text])
@@ -276,6 +288,7 @@ function App() {
   return (
     <div className="App" style={{ padding: '10%' }}>
       <header className="App-header">
+      <p>The current time is {currentTime}</p>
         {gameOverModal && isGameOver && (
           <GameOverModal winner={winner} hp1={hp1} hp2={hp2} closeModal={closeGameOverModal} newGame={newGame} />
         )}

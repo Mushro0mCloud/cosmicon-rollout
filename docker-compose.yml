@@ -10,8 +10,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
-services:
-  cache:
+  redis:
     image: redis:8.6.3
     restart: always
     ports:
@@ -20,27 +19,28 @@ services:
       - redis_data:/data
     command: redis-server --save 60 1
   backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
+    build: ./backend
     restart: always
-    depends_on: redis, rabbitmq
+    depends_on:
+      - redis
+      - rabbitmq
     environment:
-      - RABBITMQ_URL =amqp://guest:guest@localhost:5672/
-      - RABBITMQ_ACTION_QUEUE =cosmicon_actions
-      - RABBITMQ_EVENT_QUEUE = cosmicon_game_events
-    ports: 3000:3000
-
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_ACTION_QUEUE=cosmicon_actions
+      - RABBITMQ_EVENT_QUEUE=cosmicon_game_events
+      - REDIS_HOST=redis
+    ports:
+      - 5000:5000
   frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
+    build: ./frontend
     restart: always
-    depends_on: backend
+    depends_on:
+      - backend
     environment:
       - REACT_APP_API_URL=http://localhost:5000
       - HOST=0.0.0.0
-    ports: 5000:5000
+    ports:
+      - 3000:3000
 
 volumes:
   rabbitmq_data:

@@ -1,13 +1,16 @@
+import os
 import redis
 
 class CosmiconStore:
     KEY_STATE = "cosmicon_handler:game_state"
     KEY_TURNS = "cosmicon_handler:turns"
 
-    def __init__(self, host="localhost", port=6379, db=0):
+    def __init__(self, host=None, port=6379, db=0):
+        if host is None:
+            host = os.getenv('REDIS_HOST', 'redis')
         self.client = redis.Redis(host=host, port=port, db=db, decode_responses=True)
 
-    def initialize_game(self, starting_hp=5):
+    def initialize_game(self, starting_hp=30):
         self.client.hset(self.KEY_STATE, mapping={
             "current_turn": 1,
             "current_attacker": "Player 1",

@@ -1,11 +1,9 @@
-FROM node:20-alpine
-WORKDIR /app
+FROM node:22-alpine
+WORKDIR /app/frontend
 
 COPY package*.json ./
 RUN npm install
+COPY . ./
 
-COPY . .
-ENV HOST=0.0.0.0
 EXPOSE 3000
-
 CMD ["yarn", "start"]

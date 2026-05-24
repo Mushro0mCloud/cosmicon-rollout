@@ -286,119 +286,121 @@ function App() {
   }
 
   return (
-    <div className="App" style={{ padding: '10%' }}>
-      <header className="App-header">
-      <p>The current time is {currentTime}</p>
-        {gameOverModal && isGameOver && (
-          <GameOverModal winner={winner} hp1={hp1} hp2={hp2} closeModal={closeGameOverModal} newGame={newGame} />
-        )}
-        <h1>TURN {turn}</h1>
-        {midTurnModal && !gameOverModal && (
-          <MidTurnModal currentPlayer={currentPlayer} closeModal={closeMidTurnModal} turn={turn}/>
-        )}
-        <PlayerPanel
-          title="Opponent"
-          role={playerRole === 'Player 1' ? 'Player 2' : 'Player 1'}
-          hp={playerRole === 'Player 1' ? hp2 : hp1}
-          lastRolls={selectionType === 'defense' ? defenseRolls : []}
-          selected={selectedDefenseRolls}
-        />
+    <div className="App" style={{ padding: '1rem', display: 'flex', gap: '2rem', minHeight: '100vh' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <header className="App-header">
+              {gameOverModal && isGameOver && (
+                <GameOverModal winner={winner} hp1={hp1} hp2={hp2} closeModal={closeGameOverModal} newGame={newGame} />
+              )}
+              <h1>TURN {turn}</h1>
+              {midTurnModal && !gameOverModal && (
+                <MidTurnModal currentPlayer={currentPlayer} closeModal={closeMidTurnModal} turn={turn}/>
+              )}
+              <PlayerPanel
+                title="Opponent"
+                role={playerRole === 'Player 1' ? 'Player 2' : 'Player 1'}
+                hp={playerRole === 'Player 1' ? hp2 : hp1}
+                lastRolls={selectionType === 'defense' ? defenseRolls : []}
+                selected={selectedDefenseRolls}
+              />
 
-        {waitingForSelection && selectionType === 'attack' && (
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            border: '2px solid blue',
-            borderRadius: '5px',
-            backgroundColor: '#e3f2fd'
-          }}>
-            <p><strong>Select up to 3 rolls for attack:</strong></p>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1rem' }}>
-              {attackRolls.map((roll, index) => (
-                <button
-                  key={index}
-                  onClick={() => toggleAttackRollSelection(index)}
-                  style={{
-                    padding: '10px 15px',
-                    fontSize: '16px',
-                    backgroundColor: selectedAttackRolls.includes(index) ? '#4CAF50' : '#f0f0f0',
-                    color: selectedAttackRolls.includes(index) ? 'white' : 'black',
-                    border: '2px solid #999',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  {roll}
+              {waitingForSelection && selectionType === 'attack' && (
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  border: '2px solid blue',
+                  borderRadius: '5px',
+                  backgroundColor: '#e3f2fd'
+                }}>
+                  <p><strong>Select up to 3 rolls for attack:</strong></p>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    {attackRolls.map((roll, index) => (
+                      <button
+                        key={index}
+                        onClick={() => toggleAttackRollSelection(index)}
+                        style={{
+                          padding: '10px 15px',
+                          fontSize: '16px',
+                          backgroundColor: selectedAttackRolls.includes(index) ? '#4CAF50' : '#f0f0f0',
+                          color: selectedAttackRolls.includes(index) ? 'white' : 'black',
+                          border: '2px solid #999',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {roll}
+                      </button>
+                    ))}
+                  </div>
+                  <p>Selected: {selectedAttackRolls.map(i => attackRolls[i]).join(', ') || 'None'} = {selectedAttackRolls.reduce((sum, i) => sum + attackRolls[i], 0)}</p>
+                  <button onClick={() => { submitAttackSelection(); }} style={{ marginTop: '10px', padding: '10px 20px' }}>Confirm Selection</button>
+                </div>
+              )}
+
+              {waitingForSelection && selectionType === 'defense' && (
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  border: '2px solid red',
+                  borderRadius: '5px',
+                  backgroundColor: '#ffebee'
+                }}>
+                  <p><strong>Select up to 3 rolls for defense:</strong></p>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                    {defenseRolls.map((roll, index) => (
+                      <button
+                        key={index}
+                        onClick={() => toggleDefenseRollSelection(index)}
+                        style={{
+                          padding: '10px 15px',
+                          fontSize: '16px',
+                          backgroundColor: selectedDefenseRolls.includes(index) ? '#FF9800' : '#f0f0f0',
+                          color: selectedDefenseRolls.includes(index) ? 'white' : 'black',
+                          border: '2px solid #999',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {roll}
+                      </button>
+                    ))}
+                  </div>
+                  <p>Selected: {selectedDefenseRolls.map(i => defenseRolls[i]).join(', ') || 'None'} = {selectedDefenseRolls.reduce((sum, i) => sum + defenseRolls[i], 0)}</p>
+                  <button onClick={() => { submitDefenseSelection(); }} style={{ marginTop: '10px', padding: '10px 20px' }}>Confirm Selection</button>
+                </div>
+              )}
+
+              <div style={{ marginTop: '1rem' }}>
+                <button onClick={rollForDamage} disabled={playerRole !== currentPlayer || playerRole === 'Spectator' || waitingForSelection || attackConfirmedTurn}>
+                  Roll for Damage
                 </button>
-              ))}
-            </div>
-            <p>Selected: {selectedAttackRolls.map(i => attackRolls[i]).join(', ') || 'None'} = {selectedAttackRolls.reduce((sum, i) => sum + attackRolls[i], 0)}</p>
-            <button onClick={() => { submitAttackSelection(); }} style={{ marginTop: '10px', padding: '10px 20px' }}>Confirm Selection</button>
-          </div>
-        )}
-
-        {waitingForSelection && selectionType === 'defense' && (
-          <div style={{
-            marginTop: '1rem',
-            padding: '1rem',
-            border: '2px solid red',
-            borderRadius: '5px',
-            backgroundColor: '#ffebee'
-          }}>
-            <p><strong>Select up to 3 rolls for defense:</strong></p>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1rem' }}>
-              {defenseRolls.map((roll, index) => (
-                <button
-                  key={index}
-                  onClick={() => toggleDefenseRollSelection(index)}
-                  style={{
-                    padding: '10px 15px',
-                    fontSize: '16px',
-                    backgroundColor: selectedDefenseRolls.includes(index) ? '#FF9800' : '#f0f0f0',
-                    color: selectedDefenseRolls.includes(index) ? 'white' : 'black',
-                    border: '2px solid #999',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  {roll}
+                <button onClick={rollForDefense} disabled={playerRole === currentPlayer || playerRole === 'Spectator' || waitingForSelection || !attackConfirmedTurn}>
+                  Roll for Defense
                 </button>
-              ))}
-            </div>
-            <p>Selected: {selectedDefenseRolls.map(i => defenseRolls[i]).join(', ') || 'None'} = {selectedDefenseRolls.reduce((sum, i) => sum + defenseRolls[i], 0)}</p>
-            <button onClick={() => { submitDefenseSelection(); }} style={{ marginTop: '10px', padding: '10px 20px' }}>Confirm Selection</button>
+              </div>
+              <PlayerPanel
+                title={`You (${playerRole})`}
+                role={playerRole}
+                hp={playerRole === 'Player 1' ? hp1 : hp2}
+                lastRolls={selectionType === 'attack' ? attackRolls : []}
+                selected={selectedAttackRolls}
+              />
+            </header>
           </div>
-        )}
 
-        <div style={{ marginTop: '1rem' }}>
-          <button onClick={rollForDamage} disabled={playerRole !== currentPlayer || playerRole === 'Spectator' || waitingForSelection}>
-            Roll for Damage
-          </button>
-          <button onClick={rollForDefense} disabled={playerRole === currentPlayer || playerRole === 'Spectator' || waitingForSelection || !attackConfirmedTurn}>
-            Roll for Defense
-          </button>
+          <div style={{ width: '300px', minWidth: '300px' }}>
+            <h2 style={{ marginTop: 0 }}>Battle Log:</h2>
+            <ul style={{ padding: '10px', borderRadius: '5px', listStyleType: 'none', color: 'black', height: 'calc(100vh - 150px)', overflowY: 'auto', border: '1px solid #ddd', margin: 0 }}>
+              {msg.map((m, index) => (
+                <li key={index} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #eee' }}>{m}</li>
+              ))}
+              <div ref={msgList} />
+            </ul>
+          </div>
         </div>
-        <PlayerPanel
-          title={`You (${playerRole})`}
-          role={playerRole}
-          hp={playerRole === 'Player 1' ? hp1 : hp2}
-          lastRolls={selectionType === 'attack' ? attackRolls : []}
-          selected={selectedAttackRolls}
-        />
-      </header>
 
-      <div>
-        <h2>Battle Messages:</h2>
-        <ul style={{ padding: '10px', borderRadius: '5px', listStyleType: 'none', color: 'black', 'height': '150px', 'overflowY': 'auto' }}>
-          {msg.map((m, index) => (
-            <li key={index}>{m}</li>
-          ))}
-          <div ref={msgList} />
-        </ul>
-      </div>
-    </div>
   )
 }
 

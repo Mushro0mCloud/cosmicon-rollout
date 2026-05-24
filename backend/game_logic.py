@@ -81,7 +81,7 @@ class GameLogic:
             self.publish_game_event('error', {'message': 'Only the attacking player can roll attack on this turn.'}, room=session_id)
             return
 
-        rolls = [random.randint(1, 4) for _ in range(2)] + [random.randint(1, 6) for _ in range(2)] + [random.randint(1, 8) for _ in range(2)]
+        rolls = [random.randint(1, 6) for _ in range(4)] + [random.randint(1, 8) for _ in range(2)]
         self.temporary_rolls.setdefault(current_turn, {})['attack'] = rolls
 
         self.publish_game_event('attack_rolled', {
@@ -100,7 +100,7 @@ class GameLogic:
             self.publish_game_event('error', {'message': 'Only the defending player can roll defense on this turn.'}, room=session_id)
             return
 
-        rolls = [random.randint(1, 4) for _ in range(2)] + [random.randint(1, 6) for _ in range(2)] + [random.randint(1, 8) for _ in range(2)]
+        rolls = [random.randint(1, 4) for _ in range(4)] + [random.randint(1, 6) for _ in range(2)]
         self.temporary_rolls.setdefault(current_turn, {})['defense'] = rolls
 
         self.publish_game_event('defense_rolled', {

@@ -214,17 +214,13 @@ def emit_game_log(message, room=None):
 
 
 
-@app.route('/time')
-def get_current_time():
-    return jsonify({'time': time.time()})
-
 @app.route('/')
 def index():
     return jsonify({"message": "Welcome to the backend for Cosmicon-Rollout!"})
 
 @app.route('/api')
 def api():
-    return jsonify({"message": "This is a response from the backend API!"})
+    return jsonify({"message": "This is a response from the backend API."})
 
 @app.route('/api/state')
 def api_state():

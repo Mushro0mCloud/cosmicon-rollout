@@ -32,7 +32,7 @@ services:
     ports:
       - 5000:5000
   frontend:
-    build: ./frontend
+    build: .
     restart: always
     depends_on:
       - backend

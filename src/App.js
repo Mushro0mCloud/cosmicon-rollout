@@ -11,7 +11,7 @@ import PlayerPanel from './components/PlayerPanel'
 import GameOverModal from './components/GameOverModal';
 import MidTurnModal from './components/MidTurnModal';
 
-const API_URL = 'http://127.0.0.1:5000'
+const API_URL = 'http://35.255.251.132:5000'
 let socket = null;
 
 const getSocket = () => {

@@ -11,13 +11,13 @@ import PlayerPanel from './components/PlayerPanel'
 import GameOverModal from './components/GameOverModal';
 import MidTurnModal from './components/MidTurnModal';
 
-//const API_URL = 'http://127.0.0.1:5000'
+const API_URL = 'http://127.0.0.1:5000'
 let socket = null;
 
 const getSocket = () => {
   if (!socket) {
-    console.log('Initializing socket.io connection');
-    socket = io('/');
+    console.log('Initializing socket.io connection to:', API_URL);
+    socket = io(API_URL);
     socket.on('connect', () => console.log('Socket connected'));
     socket.on('disconnect', () => console.log('Socket disconnected'));
     socket.on('error', (error) => console.log('Socket error:', error));
@@ -51,6 +51,8 @@ function App() {
   const [currentTime, setCurrentTime] = useState(null)
 
   const socket = getSocket();
+
+
 
 
   // modals oh no
@@ -249,7 +251,7 @@ function App() {
 
   const newGame = async () => {
     try {
-      const response = await fetch(`/api/reset`, {
+      const response = await fetch(`${API_URL}/api/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

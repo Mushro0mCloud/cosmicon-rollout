@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-RABBITMQ_URL = os.getenv('RABBITMQ_URL', 'amqp://guest:guest@localhost:5672/')
+RABBITMQ_URL = os.getenv('RABBITMQ_URL', 'amqp://guest:guest@127.0.0.1:5672/')
 RABBITMQ_ACTION_QUEUE = os.getenv('RABBITMQ_ACTION_QUEUE', 'cosmicon_actions')
 RABBITMQ_EVENT_QUEUE = os.getenv('RABBITMQ_EVENT_QUEUE', 'cosmicon_game_events')
 

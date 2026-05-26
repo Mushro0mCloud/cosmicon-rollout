@@ -17,7 +17,7 @@ import MidTurnModal from './components/MidTurnModal';
 const getApiUrl = () => {
   const hostname = window.location.hostname;
   const port = 5000;
-  return `http://${hostname}:${port}`;
+  return `https://${hostname}:${port}`;
 };
 
 let socket = io(getApiUrl());
@@ -38,8 +38,6 @@ function App() {
   const msgList = useRef(null)
   const [turn, setTurn] = useState(1)
   const [currentPlayer, setCurrentPlayer] = useState('Player 1')
-  const [damageRoll, setDamageRoll] = useState(0)
-  const [defenseRoll, setDefenseRoll] = useState(0)
   const [hp1, setHp1] = useState(30)
   const [hp2, setHp2] = useState(30)
   const [attackConfirmedTurn, setAttackConfirmedTurn] = useState(false)
@@ -93,8 +91,6 @@ function App() {
       setCurrentPlayer(data.current_attacker)
       setHp1(data.player1_hp)
       setHp2(data.player2_hp)
-      setDamageRoll(data.last_attack)
-      setDefenseRoll(data.last_defense)
     })
 
     socket.on('turn_changed', (data) => {
@@ -128,7 +124,6 @@ function App() {
     })
 
     socket.on('attack_selection_confirmed', (data) => {
-      setDamageRoll(data.total)
       setWaitingForSelection(false)
       setSelectionType(null)
       setAttackConfirmedTurn(true)
@@ -136,7 +131,6 @@ function App() {
     })
 
     socket.on('defense_selection_confirmed', (data) => {
-      setDefenseRoll(data.total)
       setWaitingForSelection(false)
       setSelectionType(null)
       setDefenseConfirmedTurn(true)
@@ -252,7 +246,7 @@ function App() {
 
   const newGame = async () => {
     try {
-      const response = await fetch(`http://${getApiUrl()}/api/reset`, {
+      const response = await fetch(`https://${getApiUrl()}/api/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -25,7 +25,7 @@ services:
       - redis
       - rabbitmq
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_ACTION_QUEUE=cosmicon_actions
       - RABBITMQ_EVENT_QUEUE=cosmicon_game_events
       - REDIS_HOST=redis
@@ -37,7 +37,7 @@ services:
     depends_on:
       - backend
     environment:
-      - REACT_APP_API_URL=http://35.255.251.132:5000
+      - REACT_APP_API_URL=http://backend:5000
       - HOST=0.0.0.0
     ports:
       - 3000:3000

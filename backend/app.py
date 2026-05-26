@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-RABBITMQ_URL = os.getenv('RABBITMQ_URL', 'amqp://guest:guest@35.255.251.132:5672/')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'rabbitmq')
 RABBITMQ_ACTION_QUEUE = os.getenv('RABBITMQ_ACTION_QUEUE', 'cosmicon_actions')
 RABBITMQ_EVENT_QUEUE = os.getenv('RABBITMQ_EVENT_QUEUE', 'cosmicon_game_events')
 
@@ -50,8 +50,7 @@ rabbitmq_publish_warning_logged = False
 def make_rabbit_connection():
     if pika is None:
         raise RuntimeError('pika is not installed in this Python environment.')
-    params = pika.URLParameters(RABBITMQ_URL)
-    return pika.BlockingConnection(params)
+    return pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
 
 def publish_to_queue(payload, queue_name):
     global rabbitmq_publish_warning_logged

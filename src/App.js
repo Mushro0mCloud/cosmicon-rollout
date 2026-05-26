@@ -11,19 +11,26 @@ import PlayerPanel from './components/PlayerPanel'
 import GameOverModal from './components/GameOverModal';
 import MidTurnModal from './components/MidTurnModal';
 
-const API_URL = 'http://35.255.251.132:5000'
-let socket = null;
+// Construct API URL dynamically - use same hostname as current page, different port
+// This works for both Docker Compose (accessing via localhost:3000 → localhost:5000)
+// and external access (accessing via hostname/IP)
+const getApiUrl = () => {
+  const hostname = window.location.hostname;
+  const port = 5000;
+  return `http://${hostname}:${port}`;
+};
 
-const getSocket = () => {
-  if (!socket) {
-    console.log('Initializing socket.io connection to:', API_URL);
-    socket = io(API_URL);
-    socket.on('connect', () => console.log('Socket connected'));
-    socket.on('disconnect', () => console.log('Socket disconnected'));
-    socket.on('error', (error) => console.log('Socket error:', error));
-  }
-  return socket;
-}
+let socket = io(getApiUrl());
+// const getSocket = () => {
+//   if (!socket) {
+//     console.log('Initializing socket.io connection to:', API_URL);
+
+//     socket.on('connect', () => console.log('Socket connected'));
+//     socket.on('disconnect', () => console.log('Socket disconnected'));
+//     socket.on('error', (error) => console.log('Socket error:', error));
+//   }
+//   return socket;
+// }
 
 function App() {
   const [playerRole, setPlayerRole] = useState('Initializing roles...')
@@ -33,7 +40,6 @@ function App() {
   const [currentPlayer, setCurrentPlayer] = useState('Player 1')
   const [damageRoll, setDamageRoll] = useState(0)
   const [defenseRoll, setDefenseRoll] = useState(0)
-  const [lastTotalDamage, setLastTotalDamage] = useState(0)
   const [hp1, setHp1] = useState(30)
   const [hp2, setHp2] = useState(30)
   const [attackConfirmedTurn, setAttackConfirmedTurn] = useState(false)
@@ -48,9 +54,6 @@ function App() {
   const [midTurnModal, setMidTurnModal] = useState(false)
   const [winner, setWinner] = useState('Player 1')
   const [isGameOver, setIsGameOver] = useState(false)
-  const [currentTime, setCurrentTime] = useState(null)
-
-  const socket = getSocket();
 
 
 
@@ -92,7 +95,6 @@ function App() {
       setHp2(data.player2_hp)
       setDamageRoll(data.last_attack)
       setDefenseRoll(data.last_defense)
-      setLastTotalDamage(data.last_total_damage)
     })
 
     socket.on('turn_changed', (data) => {
@@ -135,7 +137,6 @@ function App() {
 
     socket.on('defense_selection_confirmed', (data) => {
       setDefenseRoll(data.total)
-      setLastTotalDamage(data.net_damage)
       setWaitingForSelection(false)
       setSelectionType(null)
       setDefenseConfirmedTurn(true)
@@ -251,7 +252,7 @@ function App() {
 
   const newGame = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/reset`, {
+      const response = await fetch(`http://${getApiUrl()}/api/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -14,13 +14,9 @@ import MidTurnModal from './components/MidTurnModal';
 // Construct API URL dynamically - use same hostname as current page, different port
 // This works for both Docker Compose (accessing via localhost:3000 → localhost:5000)
 // and external access (accessing via hostname/IP)
-const getApiUrl = () => {
-  const hostname = window.location.hostname;
-  const port = 5000;
-  return `https://${hostname}:${port}`;
-};
 
-let socket = io(getApiUrl());
+const hostname = window.location.hostname;
+let socket = io(`${hostname}:5000`);
 // const getSocket = () => {
 //   if (!socket) {
 //     console.log('Initializing socket.io connection to:', API_URL);
@@ -246,7 +242,7 @@ function App() {
 
   const newGame = async () => {
     try {
-      const response = await fetch(`https://${getApiUrl()}/api/reset`, {
+      const response = await fetch(`http://${hostname}/api/reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

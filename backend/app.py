@@ -239,6 +239,13 @@ def api_reset():
 def handle_connect():
     ensure_game_initialized()
     session_id = request.sid
+    print(f'Client connected with session ID: {session_id}')
+    emit('game_state', store.get_game_state(), room=session_id)
+
+@socketio.on('join_game')
+def handle_join_game():
+    ensure_game_initialized()
+    session_id = request.sid
     player_roles = connected_players.values()
 
     if "Player 1" not in player_roles:
@@ -249,7 +256,7 @@ def handle_connect():
         role = "Spectator"
 
     connected_players[session_id] = role
-    print(f'{role} connected with session ID: {session_id}')
+    print(f'{role} joined the game with session ID: {session_id}')
 
     emit('player_assigned', {'role': role, 'message': f'{role} has joined.'}, room=session_id)
     emit('game_state', store.get_game_state(), room=session_id)

@@ -8,7 +8,7 @@ import "./Modal.css"
 function GameOverModal({ winner, hp1, hp2, closeModal, newGame }) {
   return (
     <div className='modalBackground' onClick={closeModal}>
-      <div className='modalContainer'>
+      <div className='modalContainer modalAnimationFallIn'>
         <div className='titleCloseBtn'>
           <button onClick={closeModal}>X</button>
         </div>

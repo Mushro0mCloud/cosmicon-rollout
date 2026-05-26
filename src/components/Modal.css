@@ -20,6 +20,21 @@
   padding: 25px;
 }
 
+@keyframes fallInFromTop {
+  0% {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalAnimationFallIn {
+  animation: fallInFromTop 0.2s ease-out;
+}
+
 .modalContainer .title {
   display: inline-block;
   text-align: center;

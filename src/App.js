@@ -1,8 +1,5 @@
 //todo: make a button to actually determine when the game starts. this would be separating the connection and the role assignment.
-//todo: add reroll functionality to the attack roll. allow the attacker to select which dice to reroll up to twice.
-//todo: make midturn and gameover modals actually function.
 //todo: make the waiting room function
-//todo: make it fit in one screen
 
 import { React, useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
@@ -10,6 +7,7 @@ import './App.css';
 import PlayerPanel from './components/PlayerPanel'
 import GameOverModal from './components/GameOverModal';
 import MidTurnModal from './components/MidTurnModal';
+import WaitingRoom from './components/WaitingRoom';
 
 // Construct API URL dynamically - use same hostname as current page, different port
 // This works for both Docker Compose (accessing via localhost:3000 → localhost:5000)
@@ -29,6 +27,7 @@ let socket = io(`${hostname}:5000`);
 // }
 
 function App() {
+  const [gameJoined, setGameJoined] = useState(false)
   const [playerRole, setPlayerRole] = useState('Initializing roles...')
   const [msg, setMsg] = useState([])
   const msgList = useRef(null)
@@ -67,6 +66,10 @@ function App() {
     setMidTurnModal(false)
   }
 
+  const joinGame = () => {
+    socket.emit('join_game')
+  }
+
 
 
 
@@ -79,6 +82,7 @@ function App() {
     // Connection event, sets player role
     socket.on('player_assigned', (data) => {
       setPlayerRole(data.role)
+      setGameJoined(true)
       setMsg((prevMsg) => [...prevMsg, data.message])
     })
 
@@ -159,7 +163,7 @@ function App() {
     socket.emit('request_game_state')
 
     return () => {
-      // Note: not removing listeners to preserve bidirectional connection
+      // not removing listeners to preserve bidirectional connection
       // socket.off('player_assigned')
       // socket.off('game_state')
     }
@@ -273,6 +277,10 @@ function App() {
 
   return (
     <div className="App" style={{ padding: '1rem', display: 'flex', gap: '2rem', minHeight: '100vh' }}>
+      {!gameJoined ? (
+        <WaitingRoom onJoinGame={joinGame} />
+      ) : (
+        <>
           <div style={{ flex: 1, minWidth: 0 }}>
             <header className="App-header">
               {gameOverModal && isGameOver && (
@@ -280,14 +288,14 @@ function App() {
               )}
               <h1>TURN {turn}</h1>
               {midTurnModal && !gameOverModal && (
-                <MidTurnModal currentPlayer={currentPlayer} closeModal={closeMidTurnModal} turn={turn}/>
+                <MidTurnModal currentPlayer={currentPlayer} closeModal={closeMidTurnModal} turn={turn} hp1={hp1} hp2={hp2}/>
               )}
               <PlayerPanel
                 title="Opponent"
                 role={playerRole === 'Player 1' ? 'Player 2' : 'Player 1'}
                 hp={playerRole === 'Player 1' ? hp2 : hp1}
-                lastRolls={selectionType === 'defense' ? defenseRolls : []}
-                selected={selectedDefenseRolls}
+                maxHp={30}
+                isAttacking={currentPlayer === (playerRole === 'Player 1' ? 'Player 2' : 'Player 1')}
               />
 
               {waitingForSelection && selectionType === 'attack' && (
@@ -370,8 +378,8 @@ function App() {
                 title={`You (${playerRole})`}
                 role={playerRole}
                 hp={playerRole === 'Player 1' ? hp1 : hp2}
-                lastRolls={selectionType === 'attack' ? attackRolls : []}
-                selected={selectedAttackRolls}
+                maxHp={30}
+                isAttacking={currentPlayer === playerRole}
               />
             </header>
           </div>
@@ -385,7 +393,9 @@ function App() {
               <div ref={msgList} />
             </ul>
           </div>
-        </div>
+        </>
+      )}
+    </div>
 
   )
 }

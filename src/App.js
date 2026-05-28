@@ -1,6 +1,3 @@
-//todo: make a button to actually determine when the game starts. this would be separating the connection and the role assignment.
-//todo: make the waiting room function
-
 import { React, useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import './App.css';
@@ -306,7 +303,7 @@ function App() {
                   borderRadius: '5px',
                   backgroundColor: '#e3f2fd'
                 }}>
-                  <p><strong>Select up to 3 rolls for attack:</strong></p>
+                  <p style={{color: 'black'}}><strong>Select up to 3 rolls for attack:</strong></p>
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1rem' }}>
                     {attackRolls.map((roll, index) => (
                       <button
@@ -327,7 +324,7 @@ function App() {
                       </button>
                     ))}
                   </div>
-                  <p>Selected: {selectedAttackRolls.map(i => attackRolls[i]).join(', ') || 'None'} = {selectedAttackRolls.reduce((sum, i) => sum + attackRolls[i], 0)}</p>
+                  <p style={{color: 'black'}}>Selected: {selectedAttackRolls.map(i => attackRolls[i]).join(', ') || 'None'} = {selectedAttackRolls.reduce((sum, i) => sum + attackRolls[i], 0)}</p>
                   <button onClick={() => { submitAttackSelection(); }} style={{ marginTop: '10px', padding: '10px 20px' }}>Confirm Selection</button>
                 </div>
               )}
@@ -340,7 +337,7 @@ function App() {
                   borderRadius: '5px',
                   backgroundColor: '#ffebee'
                 }}>
-                  <p><strong>Select up to 3 rolls for defense:</strong></p>
+                  <p style={{color: 'black'}}><strong>Select up to 3 rolls for defense:</strong></p>
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '1rem' }}>
                     {defenseRolls.map((roll, index) => (
                       <button
@@ -361,7 +358,7 @@ function App() {
                       </button>
                     ))}
                   </div>
-                  <p>Selected: {selectedDefenseRolls.map(i => defenseRolls[i]).join(', ') || 'None'} = {selectedDefenseRolls.reduce((sum, i) => sum + defenseRolls[i], 0)}</p>
+                  <p style={{color: 'black'}}>Selected: {selectedDefenseRolls.map(i => defenseRolls[i]).join(', ') || 'None'} = {selectedDefenseRolls.reduce((sum, i) => sum + defenseRolls[i], 0)}</p>
                   <button onClick={() => { submitDefenseSelection(); }} style={{ marginTop: '10px', padding: '10px 20px' }}>Confirm Selection</button>
                 </div>
               )}
